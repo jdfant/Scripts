@@ -15,18 +15,15 @@ PATH=/bin/:/sbin/:/usr/bin/:/usr/sbin
 # Variables:
 sysuser="jd"
 sysuser_pw="weak_password"
-ssh_jump_server="10.10.10.1"
 supplementary_group="devs"
+db="production"
 dbuser="sql_user"
 dbuser_pw="weak_pw"
-dbroot="root"
 dbroot_pw="weak_pass"
 sudoer="yes"
 swap_size="2G"
 swap_file="/swapfile"
 
-script_version="1.0"
-    # 1.0 - Initial release
 header(){
         clear
     echo -e "\n Welcome to JD's Debian Web Stack Installer\n"
@@ -86,8 +83,7 @@ sys_prep(){
         apt-get -y autoremove &> /dev/null
     echo -e "\nDone"
     echo -e "\nInstalling base tools and apps\n"
-        apt-get -qqy install python-apt python-pycurl tmux htop dstat sysstat acct git sshguard lynis chkrootkit &> /dev/null
-                if [ $? != 0 ];then
+                if ! apt-get -qqy install python-apt python-pycurl tmux htop dstat sysstat acct git sshguard lynis chkrootkit &> /dev/null ; then
                     clear
                     echo -e "\n!!! Something failed !!!"
                     echo "\nRun 'apt-get -y install python-apt python-pycurl tmux htop dstat sysstat acct git sshguard lynis chkrootkit' manually to diagnose\n"
@@ -98,9 +94,9 @@ sys_prep(){
                 fi
     echo -e "\nDone"
     echo -e "\nAdding timestamps to bash history\n"
-        sed -i.$(date '+%b.%d.%Y') '$ a\export HISTTIMEFORMAT="%F %T "' /etc/bash.bashrc
+        sed -i."$(date '+%b.%d.%Y')" '$ a\export HISTTIMEFORMAT="%F %T "' /etc/bash.bashrc
     echo -e "\nAdding UseDNS no to sshd_config\n"
-        sed -i.$(date '+%b.%d.%Y') '$ a\UseDNS no' /etc/ssh/sshd_config
+        sed -i."$(date '+%b.%d.%Y')" '$ a\UseDNS no' /etc/ssh/sshd_config
         service ssh reload
 
     cat > /etc/sshguard/whitlist <<\Endofmessage
@@ -173,9 +169,7 @@ install_mysql(){
         mysql-server-5.5 mysql-server/root_password_again password ${dbroot_pw}
         mysql-server-5.5 mysql-server/root_password_again seen true
         " | debconf-set-selections
-        DEBIAN_FRONTEND=noninteractive apt-get -qqy install mysql-server mysql-client mytop mysqltuner &> /dev/null
-
-    if [ $? != 0 ];then
+    if ! DEBIAN_FRONTEND=noninteractive apt-get -qqy install mysql-server mysql-client mytop mysqltuner &> /dev/null ; then
             clear
         echo -e "\n!!! Something failed !!!"
         echo "\nRun 'apt-get -y install mysql-server mysql-client' manually to diagnose\n"
@@ -275,7 +269,7 @@ EOF
 db_service(){
     echo -e "\nVerifying MySQL is listening on port 3306 and all network interfaces\n"
         sleep 2
-    if [[ $(netstat -nlp | grep 0.0.0.0:3306 | wc -l) == *1* ]]; then
+    if [[ $(netstat -nlp | grep -c 0.0.0.0:3306) == *1* ]]; then
         echo "Verified!"
     else
         echo "ERROR - MySQL service not found at 0.0.0.0:3306, exiting..."
@@ -286,7 +280,7 @@ db_service(){
 db_user(){
     # Need to make this more elegant
     echo -e "\nCreating MySQL User\n"
-        mysql -u root -p$rootpw -e "$db"
+        mysql -u root -p"$dbroot_pw" -e "$db"
     echo "CREATE USER '${dbuser}'@'localhost' IDENTIFIED BY '${dbuser_pw}';" > /tmp/db.sql
     echo "GRANT ALL PRIVILEGES ON *.* TO '${dbuser}'@'localhost' WITH GRANT OPTION;" >> /tmp/db.sql
     echo "CREATE USER '${dbuser}'@'%' IDENTIFIED BY '${dbuser_pw}';" >> /tmp/db.sql
@@ -349,7 +343,7 @@ Endofmessage
 
     echo -e "\nEnabling Apache rewrites, setting Apache options, restarting Apache\n"
     echo "umask 022" >> /etc/apache2/envvars
-    sed -i.$(date '+%b.%d.%Y') 's/^ServerTokens OS/ServerTokens Prod/g' /etc/apache2/conf-available/security.conf
+    sed -i."$(date '+%b.%d.%Y')" 's/^ServerTokens OS/ServerTokens Prod/g' /etc/apache2/conf-available/security.conf
     sed -i 's/^ServerSignature On/ServerSignature Off/g' /etc/apache2/conf-available/security.conf
 
     echo "<?php phpInfo(); ?>" > /var/www/html/phpinfo.php

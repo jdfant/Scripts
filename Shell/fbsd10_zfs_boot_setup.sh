@@ -25,7 +25,7 @@ chmod 1777 /mnt/tmp
 
 zfs create system/usr
 zfs create system/usr/home
-cd /mnt
+cd /mnt || exit
 ln -sf usr/home home
 
 zfs create system/usr/local
