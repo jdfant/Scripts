@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Check (and hopefully sync) the system and hardware
 # clocks on SysV init and Systemd linux
@@ -30,7 +30,7 @@ check_apps(){
 
     if hash ntpd &> /dev/null ;then
         subject "\n ntpd is installed.\n"
-    elif [ $(hash ntpq &> /dev/null) ] || [ -x /usr/sbin/ntpd ] ;then
+    elif [ "$(hash ntpq &> /dev/null)" ] || [ -x /usr/sbin/ntpd ] ;then
         alert "\n Looks like we're using a Debian variant."
     else
         alert "\n ntpd is not installed\n\n Install ntpd and restart script.\n"
@@ -88,7 +88,7 @@ clock_sync(){
         clear
         echo -e "\n Rechecking Clocks\n"
         echo "* System Clock   = $(date "+%a %d %b %Y %r %Z")"
-        echo "* Hardware Clock =" $(sudo hwclock|awk '{print $8="",$9="";print}')
+        echo "* Hardware Clock =" "$(sudo hwclock|awk '{print $8="",$9="";print}')"
         sudo logger -t CLOCKS "Successful clock synchronization has been performed."
         echo -e "\nLooks good!\n"
     fi
@@ -99,13 +99,13 @@ clocks(){
     local HWC=$(date -d "$(sudo hwclock --show)" +%s )
     local LC=$(date +%s)
     local count=$((${HWC}-${LC}))
-    local diff=$(echo ${count}|awk '{sub("-", "");print}')
+    local diff="$(echo ${count}|awk '{sub("-", "");print}')"
         subject "\nClocks:"
         echo "* System Clock   = $(date "+%a %d %b %Y %r %Z")"
-        echo "* Hardware Clock =" $(sudo hwclock|awk '{print $8="",$9="";print}')
+        echo "* Hardware Clock =" "$(sudo hwclock|awk '{print $8="",$9="";print}')"
         echo
     # Alert if clocks are more than 5 seconds apart
-    if [ ${HWC} -ne ${LC} ];then
+    if [ "${HWC}" -ne "${LC}" ];then
         if [[ "${diff}" -gt 5 || "${diff}" -lt -5 ]];then
             alert "\n System and Hardware Clocks are NOT in sync.\n"
             clock_sync

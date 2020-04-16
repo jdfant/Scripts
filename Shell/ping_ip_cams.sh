@@ -7,9 +7,9 @@ export TERM=linux
 
 echo -e "\n Pinging IP Cameras\n"
 
-while read ip
+while read -r ip
 do
-    ping -q -c1 -W2 $ip|awk '/0 received/{print x, "is Down"};{x=$2} /1 received/{print y, "is Up"};{y=$2}'
+    ping -q -c1 -W2 "${ip}"|awk '/0 received/{print x, "is Down"};{x=$2} /1 received/{print y, "is Up"};{y=$2}'
 done < <(grep -r url ~/IP_CAMS|awk -F: '{gsub(/\/\//,"");print $3}'|sort -n)
 
 # Example IP_CAM entries:
