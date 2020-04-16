@@ -4,8 +4,8 @@
 # Quick script to check mail server cruft
 #
 
-MAIL_SERVER=mail.jdfant.com
-MAIL_USER=postmaster@jdfant.com
+MAIL_SERVER=mail.mail_server1.com
+MAIL_USER=postmaster@mail_server1.com
 PORT=25
 
 send_creds() {

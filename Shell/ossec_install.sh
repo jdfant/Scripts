@@ -9,7 +9,7 @@
 
 # "ossec_server" is the only variable that should ever need changing.
 ossec_server=xxx.xxx.xxx.xxx
-ossec_agent=$(curl https://jdfant.com/my_ip.php)
+ossec_agent=$(curl https://ifconfig.me)
 
 host_ip(){
 #           Perhaps use "curl ifconfig.me" to grab public IP, working around AWS NAT?

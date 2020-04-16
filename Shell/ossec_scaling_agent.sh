@@ -6,7 +6,7 @@
 OSSEC_SERVER=xxx.xxx.xxx.xxx
 RID=$(ls /var/ossec/queue/rids/*[0-9]*|awk -F/ '{print $6}')
 OLD_IP=$(awk '{print $3}' /root/client.keys)
-AGENT_IP=$(curl -s http://www.jdfant.com/my_ip.php)
+AGENT_IP=$(curl -s https://ifconfig.me)
 
 
 if [[ "${OLD_IP}" == "${AGENT_IP}" ]];then
