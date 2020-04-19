@@ -1,5 +1,8 @@
 #!/bin/bash
-
+#
+# Script to burn multiple USB sticks using Parallel 
+# (https://www.gnu.org/software/parallel)
+#
 echo -e "\nPreparing USB Stick\n"
 
 # Ensure USB Sticks contain DOS partition tables and are formatted EXT4
