@@ -3,7 +3,7 @@
 # Checks for "/var is 100%" conditions and attempts to correct.
 # This script has been tested on CentOS and Scientific Linux.
 # This _should_ work fine for other RH based distros.
-#
+# JD - 2011-10-14
 PATH=/bin/:/sbin/:/usr/bin/:/usr/sbin
 
 #
