@@ -1,11 +1,11 @@
 #!/bin/sh
 
 drop_lasso(){
-    rm -f /tmp/*drop.txt
+    rm -f /tmp/*drop.txt /tmp/drop_lasso
     curl -so /tmp/drop.txt  http://www.spamhaus.org/drop/drop.txt
     curl -so /tmp/edrop.txt http://www.spamhaus.org/drop/edrop.txt
 
-    for files in $(ls -l /tmp/*drop.txt)
+    for files in $(find /tmp/ -maxdepth 1 -name '*drop.txt')
      do
         gawk -i inplace -F\; '$1{print $1;!/\;/}' "${files}"
     done
@@ -28,14 +28,10 @@ ipdeny_countries(){
 }
 
 blacklist(){
-    mv /etc/PF/blacklist /root/blacklist."$(date '+%b.%d.%Y')"
-    sort -n -m /tmp/drop_lasso /tmp/country_ips > /etc/PF/blacklist 
-    if ! sort -nc /tmp/blacklist."$(date '+%b.%d.%Y')" ; then
-        exit 0
-    else
-        echo -e "\n !!! blacklist file is not sorted\n Look into it" >&2
-        exit 1
-    fi
+    rm -f /tmp/geo_blacklist
+    mv /etc/PF/geo_blacklist /root/geo_blacklist."$(date '+%Y-%m-%d')"
+    cat /tmp/drop_lasso /tmp/country_ips > /tmp/geo_blacklist
+    sort -n /tmp/geo_blacklist | uniq > /etc/PF/geo_blacklist
 }
 
 drop_lasso
