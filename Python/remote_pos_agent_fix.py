@@ -10,15 +10,13 @@ import struct
 import subprocess
 
 def get_mac(ifname):
-    """ Grab the MAC from the system.
-    """
+    """ Grab the MAC from the system """
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     data = fcntl.ioctl(sock.fileno(), 0x8927, struct.pack('256s', ifname[:15]))
     return ''.join(['%02x:' % ord(char) for char in data[18:24]])[:-1]
 
 def char_replace():
-    """ Change all colons (:) to hyphens (-) for the ID
-    """
+    """ Change all colons (:) to hyphens (-) for the ID """
     mac = get_mac('eth0').replace(':', '-')
     with open("write_it.txt", 'w') as char:
         char = char.replace('PhysicalId=00-00-00-00-00-00', \
@@ -234,7 +232,7 @@ print " Select option 1, 2, or 3 "
 print 26 * '-'
 print "1) Special Device"
 print "2) Non-Special Device"
-print "3) Get me outa here"
+print "3) Exit"
 print 26 * '-'
 
 IS_VALID = 0
