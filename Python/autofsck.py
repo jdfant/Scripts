@@ -16,13 +16,12 @@ def write_file():
             sys.exit()
         else:
             print "\n Creating autofsck file \n"
-            text_file = open("/etc/sysconfig/autofsck", "w")
-            text_file.writelines(contents)
+            with open("/etc/sysconfig/autofsck", "w") as text_file:
+                text_file.writelines(contents)
             subprocess.Popen(['chmod', '0755', '/etc/sysconfig/autofsck']).wait()
             subprocess.Popen(['chown', 'root:root', '/etc/sysconfig/autofsck']).wait()
-            text_file.close()
-    except:
-        print "\n Unexpected error! \n"
+    except OSError as err:
+        print"Unexpected Error '{0}' Occured. Arguments {1}.".format(err.message, err.args)
 
 def main():
     """ Make it go """
