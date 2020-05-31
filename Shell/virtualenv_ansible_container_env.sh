@@ -4,7 +4,7 @@
 # 
 # !!! Ansible Container has been deprecated !!!
 #
-# If you still desire a similar for building Docker containers, take a look at:
+# If you still desire something similar for building Docker containers, take a look at:
 # https://github.com/ansible-community/ansible-bender
 #
 
