@@ -1,0 +1,88 @@
+pipeline {
+    agent none
+    options {
+        timeout(time: 15, unit: 'MINUTES')
+        timestamps()
+        buildDiscarder(logRotator(numToKeepStr: '7'))
+    }
+    stages {
+        stage('Prepare'){
+            agent { label 'docker' }
+            steps {
+                parallel (
+                    Clean: {
+                        deleteDir()
+                    },
+                    NotifySlack: {
+                        slackSend channel: 'cicd', color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+                    }
+                )
+            }
+        }
+        stage('Checkout'){
+            agent { label 'docker' }
+            steps {
+                git credentialsId: 'xxxxxxxxxxxxxxxxxxxxxx', url: 'git@gitlab.com:jdfant/docker.git'
+                script {
+                    env.GIT_COMMIT_HASH = sh returnStdout: true, script: 'git rev-parse --verify HEAD'
+                }
+            }
+        }
+        stage('Build Docs') {
+            agent {
+                docker {
+                    image "registry.home.lan/python:0.1"
+                    label "docker"
+                }
+            }
+            steps {
+                sh 'python build'
+            }
+        }
+        stage('Prepare Docker Image'){
+            agent { label 'docker' }
+            steps {
+                parallel (
+                    TestDockerfile: {
+                        script {
+                            def lintResult = sh returnStdout: true, script: 'docker run --rm -i hadolint/hadolint < Dockerfile'
+// Alternative -- def lintResult = sh returnStdout: true, script: 'docker run -it --rm -v $PWD:/root projectatomic/dockerfile-lint dockerfile_lint -f Dockerfile'
+                            if (lintResult.trim() == '') {
+                                println 'Lint finished with no errors'
+                            } else {
+                                println 'Lint Error'
+                                println "${lintResult}"
+                                currentBuild.result = 'UNSTABLE'
+                            }
+                        }
+                    }, // end test dockerfile
+                    BuildImage: {
+                        sh 'chmod +x build-python.sh'
+                        sh './build-python.sh'
+                    } 
+                )
+            }
+            post {
+                success {
+                    sh 'chmod +x push-python.sh'
+                    sh './push-python.sh'
+                }
+            }
+        }
+        stage('Update Docker Container') {
+            agent { label 'docker' }
+            steps {
+                sh 'chmod +x docker-container-update.sh'
+                sh "./docker-container-update.sh ${env.BUILD_URL} ${env.GIT_COMMIT_HASH}"
+            }
+        }
+    }
+    post {
+        success {
+            slackSend channel: 'cicd', color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+        }
+        failure {
+            slackSend channel: 'cicd', color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+        }
+    }
+}
