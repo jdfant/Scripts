@@ -13,6 +13,7 @@ pipeline {
                     Clean: {
                         deleteDir()
                     },
+                    // https://www.jenkins.io/doc/pipeline/steps/slack/
                     NotifySlack: {
                         slackSend channel: 'cicd', color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
                     }
@@ -46,7 +47,7 @@ pipeline {
                     TestDockerfile: {
                         script {
                             def lintResult = sh returnStdout: true, script: 'docker run --rm -i hadolint/hadolint < Dockerfile'
-// Alternative -- def lintResult = sh returnStdout: true, script: 'docker run -it --rm -v $PWD:/root projectatomic/dockerfile-lint dockerfile_lint -f Dockerfile'
+          // Alternative -- def lintResult = sh returnStdout: true, script: 'docker run -it --rm -v $PWD:/root projectatomic/dockerfile-lint dockerfile_lint -f Dockerfile'
                             if (lintResult.trim() == '') {
                                 println 'Lint finished with no errors'
                             } else {
