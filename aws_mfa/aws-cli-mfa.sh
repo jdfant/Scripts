@@ -1,11 +1,15 @@
 #!/bin/bash
 
+#
+# Cheap and effective MFA shell script for AWS
+#
+
 # Default File Names
 MFA_DEVICE_FILE="${HOME}/.aws/.mfa_device"
 MFA_TOKEN_FILE="${HOME}/.aws/.mfa_token"
 AWS_CREDS="${HOME}/.aws/credentials"
 AWS_CREDS_ORIG="${HOME}/.aws/credentials.orig"
-DURATION_SECONDS=36000
+DURATION_SECONDS=43200 # 12 hour timeout, adjust accordingly.
 
 # Copy existing credentials file
 if [ -s "${AWS_CREDS_ORIG}" ]; then
