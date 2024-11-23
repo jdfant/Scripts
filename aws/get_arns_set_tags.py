@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Discover resources not tagged with map-migrated and tag them.
+Discover resources not tagged with specific key
+then add tag key along with tag value
 """
 
 import boto3
