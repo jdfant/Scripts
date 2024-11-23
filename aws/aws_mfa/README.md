@@ -1,5 +1,7 @@
 <!-- BEGIN_AWS_MFA_DOC -->
-# AWS MFA Setup and Usage Instructions
+# Cheap and effective MFA shell script for AWS
+
+## Setup and Usage Instructions
 
 ## Description
 This page addresses using a script to setup MFA for AWS command line functions, including:
