@@ -23,7 +23,7 @@ Enforces MFA for command line functions.
     - MFAAdmin
 
 ## Preparation
-The script is located at https://github.com/jdfant/Scripts/blob/master/aws_mfa/aws-cli-mfa.sh
+The script is located at https://github.com/jdfant/Scripts/blob/main/aws/aws_mfa/aws-cli-mfa.sh
 
 Download the script and copy or move it to **/usr/local/bin/**
 
